@@ -81,7 +81,7 @@ The algorithm is:
 
 1. Initialize universal perturbation $\delta$ to zero.
 2. For each image $x_i$ in the training set, compute DeepFool perturbation $r_i$ (the minimal perturbation to cross the decision boundary).
-3. Proposed update: $\delta' = $\delta$ + r_i$.
+3. Proposed update: $\delta' = \delta + r_i$.
 4. Project: $\delta = clip(\delta', \epsilon$) in the $L_{\infty}$ norm.
 5. Repeat over the training set until fooling rate exceeds 80 percent.
 

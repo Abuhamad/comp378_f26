@@ -71,7 +71,7 @@ Face recognition evasion attacks follow a similar pattern. Sharif et al. 2016 de
 
 A universal adversarial perturbation is an image-agnostic perturbation. It fools a classifier on any input image. Whereas an adversarial patch is paired with a single target object, a UAP is a single perturbation $\delta$. When added to any image, it produces a high probability of misclassification across the image set.
 
-The UAP is defined formally as a perturbation $\delta$ bounded in the $L_{\infty}$ norm: % (e.g., $\epsilon=8/255$). When added to any natural image $x$, $f$ misclassifies the perturbed image $x+\delta$ with probability exceeding a threshold (e.g., 80 percent fooling rate). The constraint $||\delta||_{\infty} <= \epsilon$ ensures the perturbation remains small and imperceptible.
+The UAP is defined formally as a perturbation $\delta$ bounded in the $L_{\infty}$ norm: (e.g., $\epsilon=8/255$). When added to any natural image $x$, $f$ misclassifies the perturbed image $x+\delta$ with probability exceeding a threshold (e.g., 80 percent fooling rate). The constraint $||\delta||_{\infty} <= \epsilon$ ensures the perturbation remains small and imperceptible.
 
 UAPs generalize across images because they exploit a global property of the classifier. Classifiers are sensitive to orthogonal feature space directions independent of specific image content. Perturbations moving representations away from correct class clusters in one image also move representations away in other images. UAPs thus capture classifier vulnerabilities transcending individual inputs.
 

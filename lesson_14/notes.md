@@ -14,11 +14,11 @@ This lesson covers practical defenses that pre-process inputs to reduce adversar
 
 ### Motivation: Why Pre-Processing Defenses
 
-White-box attacks from m08 (FGSM, PGD) operate at epsilon = 8/255, a 3 percent pixel-value perturbation. Robust training to defend against these attacks costs 10 times more compute than standard training. Pre-processing defenses offer a faster, cheaper alternative. Feature squeezing, JPEG compression, and autoencoder denoising can be deployed immediately while robust models train in the background. This lesson explores their mechanics and their failure modes against adaptive attacks.
+White-box attacks from m08 (FGSM, PGD) operate at $\epsilon = 8/255$, a 3 percent pixel-value perturbation. Robust training to defend against these attacks costs 10 times more compute than standard training. Pre-processing defenses offer a faster, cheaper alternative. Feature squeezing, JPEG compression, and autoencoder denoising can be deployed immediately while robust models train in the background. This lesson explores their mechanics and their failure modes against adaptive attacks.
 
 ### Feature Squeezing
 
-Bit-depth reduction constrains pixel values to fewer bits. A standard image uses 8 bits per channel, allowing 256 values (0 to 255). Reducing to 1 bit per channel yields only 2 values. When we add an adversarial perturbation of size epsilon = 8/255 to an 8-bit value and then quantize to 1-bit, quantization often discards the perturbation.
+Bit-depth reduction constrains pixel values to fewer bits. A standard image uses 8 bits per channel, allowing 256 values (0 to 255). Reducing to 1 bit per channel yields only 2 values. When we add an adversarial perturbation of size $\epsilon = 8/255$ to an 8-bit value and then quantize to 1-bit, quantization often discards the perturbation.
 
 Spatial smoothing using a median filter removes small high-frequency structures. A 3 by 3 median filter replaces each pixel with the median of its 3 by 3 neighborhood, smoothing out thin lines and sparse noise. A 5 by 5 filter is more aggressive. Adversarial perturbations tend to spread across many pixels in sparse patterns; median filtering can suppress them while preserving edges.
 
@@ -30,11 +30,11 @@ Feature squeezing trades accuracy against defense strength. Reducing to 1 bit de
 
 JPEG compression decomposes images into frequency components via the discrete cosine transform (DCT). Each 8 by 8 pixel block is transformed into cosine basis functions: low frequencies (broad color regions) and high frequencies (edges, fine detail). Adversarial perturbations concentrate in high-frequency components because they must be small in magnitude yet change classifier predictions.
 
-The quantization step follows DCT. High-frequency coefficients are divided by large quantization values and rounded, discarding fine-grained information. The quality factor Q, typically 1 to 100, controls quantization coarseness. Q = 100 preserves all frequencies with minimal loss. Q = 50 aggressively quantizes high frequencies. Q = 1 discards nearly everything.
+The quantization step follows DCT. High-frequency coefficients are divided by large quantization values and rounded, discarding fine-grained information. The quality factor $Q$, typically 1 to 100, controls quantization coarseness. $Q = 100$ preserves all frequencies with minimal loss. $Q = 50$ aggressively quantizes high frequencies. $Q = 1$ discards nearly everything.
 
 When JPEG decompresses, high-frequency adversarial perturbations vanish. An adversarial example crafted at the image level cannot survive the DCT and quantization round trip.
 
-Trade-off between robustness and accuracy exists. At Q = 75 on CIFAR-10, adversarial accuracy against FGSM improves 15 to 25 percent compared to no defense, but clean accuracy drops 5 to 10 percent. At Q = 50, the adversarial gain is larger, but clean accuracy drops 15 to 20 percent. Moderate Q values like 75 are practical middle grounds.
+Trade-off between robustness and accuracy exists. At $Q = 75$ on CIFAR-10, adversarial accuracy against FGSM improves 15 to 25 percent compared to no defense, but clean accuracy drops 5 to 10 percent. At $Q = 50$, the adversarial gain is larger, but clean accuracy drops 15 to 20 percent. Moderate $Q$ values like 75 are practical middle grounds.
 
 ### Autoencoder-Based Denoising
 
@@ -56,7 +56,7 @@ Pre-processing defenses are heuristics, not guarantees. They work well against w
 
 ### Defense Evaluation Protocol
 
-A fair evaluation compares three defense configurations and two attack methods. Defense configurations: (1) no defense baseline, (2) bit-depth reduction to 3 bits and 3 by 3 median filter, (3) full three-stage pipeline (bit-depth + median + JPEG at Q = 75). Attack methods: FGSM at epsilon = 8/255; PGD with step size alpha = 2/255, 40 iterations, and epsilon = 8/255.
+A fair evaluation compares three defense configurations and two attack methods. Defense configurations: (1) no defense baseline, (2) bit-depth reduction to 3 bits and 3 by 3 median filter, (3) full three-stage pipeline (bit-depth + median + JPEG at $Q = 75$). Attack methods: FGSM at $\epsilon = 8/255$; PGD with step size $\alpha = 2/255$, 40 iterations, and $\epsilon = 8/255$.
 
 For each combination, compute three accuracies: clean accuracy (unperturbed inputs), FGSM adversarial accuracy, and PGD adversarial accuracy. Report the nine numbers in a 3 by 3 table (rows are defense variants, columns are input types).
 

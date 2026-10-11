@@ -75,7 +75,7 @@ or a weighted average $\delta_{\text{ens}} = \sum_{k=1}^{K} w_k \, \delta_k$ wit
 Empirical results show ensemble size matters:
 
 | Ensemble size $K$ | Approximate transfer rate |
-|:---:|:---:|
+| :---: | :---: |
 | 1 (single surrogate) | 55-60% |
 | 2 | 65-70% |
 | 3 | 72-78% |

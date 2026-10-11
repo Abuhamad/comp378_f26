@@ -54,7 +54,7 @@ The comparison is clear. Score-based attacks use returned scores to focus update
 
 ## Lab
 
-See the lab notebook at [./lesson_10/lab.ipynb](./lesson_10/lab.ipynb). The notebook implements a simplified Square Attack against a mock black-box API and reports success rate and median query cost across budgets of 1 000, 5 000, and 10 000 queries.
+See the lab notebook at [./lab.ipynb](./lab.ipynb). The notebook implements a simplified Square Attack against a mock black-box API and reports success rate and median query cost across budgets of 1 000, 5 000, and 10 000 queries.
 
 ## Summary
 

@@ -57,7 +57,7 @@ A single backward pass per class yields these derivatives. The attack then build
 
 ## Lab
 
-See the lab notebook at [./lesson_09/lab.ipynb](./lesson_09/lab.ipynb). The notebook crafts adversarial examples for a 10-class MNIST digit classifier using the Projected Gradient Descent (PGD) white-box attack, then trains a binary detector that tries to catch those perturbations and see why it does not generalize across attack strengths.
+See the lab notebook at [./lab.ipynb](./lab.ipynb). The notebook crafts adversarial examples for a 10-class MNIST digit classifier using the Projected Gradient Descent (PGD) white-box attack, then trains a binary detector that tries to catch those perturbations and see why it does not generalize across attack strengths.
 
 ## Summary
 

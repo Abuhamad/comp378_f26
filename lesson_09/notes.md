@@ -30,21 +30,27 @@ This random offset prevents the attack from locking onto a weak local path befor
 ### Carlini & Wagner (C&W)
 
 FGSM and PGD optimize a loss tied to the true label, yet neither method directly optimizes the classification margin. C&W changes the setup by solving a direct optimization problem over the perturbation itself. The objective is
+
 $$
 \min_{\delta} \|\delta\|_2 + c \cdot f(x+\delta)
 $$
+
 The term $\|\delta\|_2$ keeps the perturbation small. The function $f$ penalizes correct classification and pushes the model toward a wrong prediction. A successful adversarial example reduces the margin for the true class while keeping the perturbation compact. The box-constraint issue appears because the adversarial input must stay inside valid pixel bounds. C&W removes this issue with a change of variables. The perturbation is written as
+
 $$
 \delta = \tfrac{1}{2}(\tanh(w) + 1) - x
 $$
+
 This keeps the perturbed input inside $[0,1]$ without an explicit projection step. The search then runs over $w$ instead of raw pixels, which makes the optimization smoother and more stable. The confidence parameter $\kappa$ controls how strongly the attack pushes the model away from the true label. Larger $\kappa$ encourages a larger classification gap, which often yields a more confident misclassification but a larger perturbation. In practice, the attack searches over a penalty coefficient $c$ with binary search to find the smallest perturbation causing a prediction change under the requested confidence level. C&W is a strong $L_2$ attack for perturbation minimization. In the lab, each run evaluates 64 inputs and reports the mean $L_2$ norm across the batch. This batch view shows whether the attack stays strong across many examples rather than only on one image.
 
 ### Jacobian-based Saliency Map Attack (JSMA)
 
 JSMA follows a different route. This method works under an $L_0$ budget, which limits the total number of pixels changed. The objective is sparse, not smooth. The attack chooses a small set of pixels with the highest effect on the model output. The key object is the input Jacobian of the model output with respect to the input. For a target class $t$, the Jacobian entry is
+
 $$
 J_{ij} = \frac{\partial F_t(x)_i}{\partial x_j}
 $$
+
 A single backward pass per class yields these derivatives. The attack then builds a saliency map from the most influential input coordinates. A common score for a candidate pixel pair $(p, q)$ is based on the sum of positive directional effects on the target class and negative effects on competing classes, which highlights the pair with the strongest change in model output. The attack chooses the pair with the highest saliency score, modifies both entries by a step $\theta$, and repeats until either the model misclassifies or the $L_0$ budget is exhausted. This makes JSMA different from $L_\infty$ attacks such as PGD. PGD spreads a small change across many pixels. JSMA changes a few pixels aggressively, which matches the $L_0$ threat model. The attack remains sparse, targeted, and bounded by a count constraint rather than a per-pixel magnitude constraint.
 
 ## Lab

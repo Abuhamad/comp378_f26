@@ -75,7 +75,7 @@ This trade-off is central to white-box evasion. The objective is to push the inp
 
 ## Lab
 
-See the lab notebook at [./lesson_08/lab.ipynb](./lab.ipynb). The notebook crafts adversarial examples for a 10-class MNIST digit classifier using the single-step Fast Gradient Sign Method (FGSM), then trains a binary detector and tests whether detection generalizes across attack strengths.
+See the lab notebook at [./lab.ipynb](./lab.ipynb). The notebook crafts adversarial examples for a 10-class MNIST digit classifier using the single-step Fast Gradient Sign Method (FGSM), then trains a binary detector and tests whether detection generalizes across attack strengths.
 
 ## Summary
 

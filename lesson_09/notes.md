@@ -22,9 +22,11 @@ x^{t+1} = \Pi_{\mathcal{B}_\epsilon(x)}\Bigl(x^t + \alpha \cdot \text{sign}(\nab
 $$
 
 The operator $\Pi_{\mathcal{B}_\epsilon(x)}$ is the projection onto the $L_\infty$ ball of radius $\epsilon$ around $x$. In practice, each coordinate is clipped to $[x_i - \epsilon, x_i + \epsilon]$ after every step. This projection keeps the adversarial example inside the same perturbation budget while allowing multiple updates to move deeper into the misclassification region. A random start improves the attack. The update begins from
+
 $$
 x^0 = x + u, \quad u \sim \mathcal{U}(-\epsilon, \epsilon)
 $$
+
 This random offset prevents the attack from locking onto a weak local path before the search begins. Small step size $\alpha$ and many iterations $k$ usually produce stronger attacks than one large step. PGD remains the standard white-box benchmark because the method preserves a clear search procedure inside the norm ball while raising the attack strength above a single FGSM step.
 
 ### Carlini & Wagner (C&W)

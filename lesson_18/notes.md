@@ -16,7 +16,9 @@ This lesson covers formal verification of neural networks under bounded perturba
 
 ### Formal Verification Problem Statement
 
-Verification asks: given a neural network $f$, an input $x$, a perturbation radius $\varepsilon$, and a property $P$, does $f(x')$ satisfy property $P$ for all $x'$ such that $||x' - x||∞ ≤ \varepsilon$? The property $P$ typically encodes a safety constraint. Example: "*$f(x')$ does not misclassify to any adversarial class*” or “*the output logit for the true class stays above all other logits by margin $\delta$.*” Formal verification converts this logical question into a yes/no answer with a mathematical proof.
+Verification asks: given a neural network $f$, an input $x$, a perturbation radius $\varepsilon$, and a property $P$, does $f(x')$ satisfy property $P$ for all $x'$ such that $||x' - x||∞ ≤ \varepsilon$ ? The property $P$ typically encodes a safety constraint. 
+
+Example: ``$f(x')$ does not misclassify to any adversarial class'' or “*the output logit for the true class stays above all other logits by margin $\delta$.*” Formal verification converts this logical question into a yes/no answer with a mathematical proof.
 
 Two classes of answer exist. A verification method is sound if its answer is always correct: when it says "yes, the property holds for all perturbations," that claim cannot be false. A method is complete if it can answer yes or no for any property and network in finite time: no unanswerable cases. Most practical methods trade completeness for scalability. Randomized smoothing from lesson 17 gave a probabilistic guarantee. Now we want a definitive proof.
 

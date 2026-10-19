@@ -2,12 +2,12 @@
 
 ## Abstract
 
-This lesson covers randomized smoothing, a probabilistic defense technique to certify robustness with a formal guarantee. Students learn how Gaussian noise injection yields a smoothed classifier, why the Neyman-Pearson lemma makes Gaussian noise optimal for L₂ certification, and how Cohen et al. (2019) uses hypothesis testing to compute a certified radius for each input.
+This lesson covers randomized smoothing, a probabilistic defense technique to certify robustness with a formal guarantee. Students learn how Gaussian noise injection yields a smoothed classifier, why the Neyman-Pearson lemma makes Gaussian noise optimal for $L_2$ certification, and how Cohen et al. (2019) uses hypothesis testing to compute a certified radius for each input.
 
 ## Objectives
 
 - State the smoothed classifier definition and explain the relationship between the base classifier and the smoothed classifier.
-- Justify Gaussian noise injection using the Neyman-Pearson lemma and isoperimetric inequality to derive L₂ certification.
+- Justify Gaussian noise injection using the Neyman-Pearson lemma and isoperimetric inequality to derive $L_2$ certification.
 - Implement a Monte Carlo sampling procedure with Clopper-Pearson confidence intervals to compute certified radius.
 - Compute and interpret certified accuracy versus noise level trade-off curves.
 - Explain abstention and when a certified prediction is declined.
@@ -24,13 +24,13 @@ Unlike an ensemble of diverse models, the smoothed classifier reuses one base mo
 
 ### Gaussian noise injection rationale
 
-The Neyman-Pearson lemma establishes the optimal statistical test for distinguishing between two distributions. To tell apart $\mathcal{N}(\mu_1, \sigma^2 I)$ from $\mathcal{N}(\mu_2, \sigma^2 I)$, the optimal test compares the likelihood ratio against a threshold. This test has the lowest false-negative rate for any fixed false-positive rate. The optimal test depends on the difference $|\mu_1 - \mu_2|$ in the L₂ norm.
+The Neyman-Pearson lemma establishes the optimal statistical test for distinguishing between two distributions. To tell apart $\mathcal{N}(\mu_1, \sigma^2 I)$ from $\mathcal{N}(\mu_2, \sigma^2 I)$, the optimal test compares the likelihood ratio against a threshold. This test has the lowest false-negative rate for any fixed false-positive rate. The optimal test depends on the difference $|\mu_1 - \mu_2|$ in the $L_2$ norm.
 
 For certified robustness, the intuition is direct. An adversary perturbs an input $x$ by adding a bounded noise vector $\delta$ with $\|\delta\|_2 \leq r$. If we view the adversarial perturbation and the Gaussian noise as competing to flip the predicted class, the Neyman-Pearson lemma says Gaussian noise is the hardest-to-beat defense because it provides the tightest statistical separation.
 
-The isoperimetric inequality for Gaussian measure refines this intuition. Among all measurable sets with the same surface area in an L₂ ball, the half-space maximizes the Gaussian measure of points outside the ball. This means shifting a half-space (decision boundary) by an L₂ distance $r$ affects the Gaussian probability less than shifting any other shape. A certifiable defense against L₂ perturbations leverages this geometric fact.
+The isoperimetric inequality for Gaussian measure refines this intuition. Among all measurable sets with the same surface area in an $L_2$ ball, the half-space maximizes the Gaussian measure of points outside the ball. This means shifting a half-space (decision boundary) by an $L_2$ distance $r$ affects the Gaussian probability less than shifting any other shape. A certifiable defense against $L_2$ perturbations leverages this geometric fact.
 
-Gaussian noise is specific to L₂ certification. Laplace noise would certify L∞ robustness, but Laplace's distribution does not perform as well for the L₂ case. Randomized smoothing with Gaussian noise is the principled choice for L₂.
+Gaussian noise is specific to $L_2$ certification. Laplace noise would certify L∞ robustness, but Laplace's distribution does not perform as well for the $L_2$ case. Randomized smoothing with Gaussian noise is the principled choice for $L_2$.
 
 ### Cohen et al. (2019) certification
 

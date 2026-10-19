@@ -7,7 +7,7 @@ This lesson covers formal verification of neural networks under bounded perturba
 ## Objectives
 
 - Student can trace Interval Bound Propagation through a two-layer ReLU network by hand, propagating input interval to output interval.
-- Student can use auto_LiRPA to obtain IBP and $\alpha$-CROWN certified bounds for a small neural network under an L∞ perturbation.
+- Student can use auto_LiRPA to obtain IBP and $\alpha$-CROWN certified bounds for a small neural network under an $L_\infty$ perturbation.
 - Student can state the completeness and soundness guarantees of SMT-based verification (Reluplex) versus relaxation-based methods.
 - Student can explain why IBP is sound but incomplete and why this matters for certification claims.
 - Student can describe the scalability limits of complete verification and when incomplete methods are preferred.
@@ -85,14 +85,14 @@ Comparison: IBP is fastest but loosest (seconds, very wide bounds). $\alpha$-CRO
 
 SMT solvers handle satisfiability of systems of linear arithmetic constraints with select non-linear functions. Reluplex encodes the neural network as SMT constraints. Each neuron is a variable. Weights and biases are constants. Linear layers become linear arithmetic constraints. ReLU is encoded as a disjunction: either $pre ≤ $0 and $post = 0$, or $pre > 0$ and $post = pre$. This disjunction models the two possible modes of a ReLU.
 
-Reluplex uses the SMT solver internally to explore the constraint space. It alternates between two phases: **relaxation** and **refinement**. 
+Reluplex uses the SMT solver internally to explore the constraint space. It alternates between two phases: **relaxation** and **refinement**.
 
-- In relaxation, drop the ReLU disjunction and solve the resulting linear program. 
-- In refinement, check which ReLU constraints are violated and add splitting constraints to repair them. 
+- In relaxation, drop the ReLU disjunction and solve the resulting linear program.
+- In refinement, check which ReLU constraints are violated and add splitting constraints to repair them.
 
 This interplay continues until either a satisfying assignment is found (adversarial example found) or the solver proves unsatisfiability (property holds).
 
-**Soundness** and **completeness**: if Reluplex terminates with `UNSAT`, the property is proven to hold for all perturbations within $\varepsilon$. If it terminates with `SAT`, an explicit adversarial example is returned. 
+**Soundness** and **completeness**: if Reluplex terminates with `UNSAT`, the property is proven to hold for all perturbations within $\varepsilon$. If it terminates with `SAT`, an explicit adversarial example is returned.
 
 If the solver runs to a configurable timeout, the result is inconclusive. Reluplex is the only practical method in this lesson that combines soundness and completeness, meaning a negative result is a proof, not just a failed verification.
 
@@ -118,7 +118,7 @@ For modern architectures, scalable verification remains an open problem. Transfo
 
 See [./lesson_18/lab.ipynb](./lab.ipynb).
 
-This lab exercises Interval Bound Propagation and $\alpha$-CROWN using the auto_LiRPA library. Students load a pre-trained 3-layer MLP, compute certified bounds under L∞ perturbations, and compare bound tightness between the two methods.
+This lab exercises Interval Bound Propagation and $\alpha$-CROWN using the auto_LiRPA library. Students load a pre-trained 3-layer MLP, compute certified bounds under $L_\infty$ perturbations, and compare bound tightness between the two methods.
 
 ## Summary
 

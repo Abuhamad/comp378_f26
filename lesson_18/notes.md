@@ -85,7 +85,7 @@ Comparison: IBP is fastest but loosest (seconds, very wide bounds). $\alpha$-CRO
 
 ### SMT-Based Verification (Reluplex)
 
-SMT solvers handle satisfiability of systems of linear arithmetic constraints with select non-linear functions. Reluplex encodes the neural network as SMT constraints. Each neuron is a variable. Weights and biases are constants. Linear layers become linear arithmetic constraints. ReLU is encoded as a disjunction: either $pre ≤ $0 and $post = 0$, or $pre > 0$ and $post = pre$. This disjunction models the two possible modes of a ReLU.
+SMT solvers handle satisfiability of systems of linear arithmetic constraints with select non-linear functions. Reluplex encodes the neural network as SMT constraints. Each neuron is a variable. Weights and biases are constants. Linear layers become linear arithmetic constraints. ReLU is encoded as a disjunction: either $pre ≤ 0$ and $post = 0$, or $pre > 0$ and $post = pre$. This disjunction models the two possible modes of a ReLU.
 
 Reluplex uses the SMT solver internally to explore the constraint space. It alternates between two phases: **relaxation** and **refinement**.
 

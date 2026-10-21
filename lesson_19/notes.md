@@ -72,7 +72,7 @@ Red-teaming differs from ad-hoc testing in three ways. First, it is systematic. 
 
 ## Lab
 
-See [./lab-latest.ipynb](./lab-latest.ipynb). The lab exercises automated vulnerability auditing using IBM ART: loading a CIFAR-10 model into an ART `PyTorchClassifier`, running three attacks (FGSM, PGD, C&W) on test data, computing per-attack fooling rates and perturbation magnitudes, and producing a structured vulnerability report. The lab also covers situating a model on the RobustBench leaderboard by comparing its AutoAttack accuracy to published leaderboard values.
+See the lab notebook at [./lesson_19/lab.ipynb](./lab.ipynb). The lab exercises automated vulnerability auditing using IBM ART and AutoAttack: loading a CIFAR-10 model, running attacks on test data, computing per-attack fooling rates and perturbation magnitudes, and producing a structured vulnerability report. The lab also covers examining a model from the RobustBench leaderboard.
 
 ## Summary
 

@@ -80,8 +80,8 @@ Standardized robustness benchmarks like RobustBench use the AutoAttack ensemble 
 
 ## Useful References and Resources
 
-- RobustBench leaderboard: https://robustbench.github.io/. CIFAR-10 and ImageNet leaderboards with AutoAttack evaluation criteria and model checkpoints.
+- RobustBench leaderboard: <https://robustbench.github.io/>. CIFAR-10 and ImageNet leaderboards with AutoAttack evaluation criteria and model checkpoints.
 - AutoAttack paper (Croce & Hein, 2020): "Reliable evaluation of adversarial robustness with an ensemble of diverse parameter-free attacks". Describes APGD-CE, APGD-DLR, FAB, and Square Attack.
-- IBM Adversarial Robustness Toolbox (ART) documentation: https://adversarial-robustness-toolbox.readthedocs.io/. API reference, attack implementations, and tutorial notebooks.
-- NIST AI Risk Management Framework (AI RMF) section on red-teaming: https://pages.nist.gov/AIRMF/. Governance and deployment best practices.
-- MLflow documentation (from Lesson 06): https://mlflow.org/. Experiment tracking and model registry for continuous monitoring.
+- IBM Adversarial Robustness Toolbox (ART) documentation: <https://adversarial-robustness-toolbox.readthedocs.io/>. API reference, attack implementations, and tutorial notebooks.
+- NIST AI Risk Management Framework (AI RMF) section on red-teaming: <https://pages.nist.gov/AIRMF/>. Governance and deployment best practices.
+- MLflow documentation (from Lesson 06): <https://mlflow.org/>. Experiment tracking and model registry for continuous monitoring.

@@ -203,5 +203,5 @@ Federated Learning enables training on distributed private data by aggregating m
 - Bonawitz, K., et al. (2019). "Towards Federated Learning at Scale: System Design." Proceedings of MLSys. Defines the FedAvg algorithm and cross-device architecture used in production systems.
 - McMahan, H. B., et al. (2017). "Communication-Efficient Learning of Deep Networks from Decentralized Data." ICML. Original FedAvg paper, introduces weighted averaging and proves convergence bounds under IID data.
 - Zhao, Y., Li, M., Lai, L., Suda, N., Civin, D., and Chandra, V. (2018). "Federated Learning with Non-IID Data." arXiv:1806.00582. Quantifies the accuracy gap between IID and non-IID FL and proposes FedProx.
-- Flower Framework Documentation. https://flower.ai/docs. Official Flower API reference and tutorial for NumPyClient and server strategy.
-- TensorFlow Federated. https://www.tensorflow.org/federated. Alternative framework for federated learning with simulation and deployment examples.
+- Flower Framework Documentation. <https://flower.ai/docs>. Official Flower API reference and tutorial for NumPyClient and server strategy.
+- TensorFlow Federated. <https://www.tensorflow.org/federated>. Alternative framework for federated learning with simulation and deployment examples.

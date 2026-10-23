@@ -192,7 +192,7 @@ Flower handles the mechanics of broadcasting, aggregating, and round orchestrati
 
 ## Lab
 
-See [lab.ipynb](./lab.ipynb). The lab implements a FedAvg simulation with Flower on CIFAR-10, comparing IID and non-IID data distributions to measure the effect of label skew on convergence.
+See [lab.ipynb](./lab.ipynb). The lab implements a FedAvg simulation with Flower on MNIST, comparing IID and non-IID data distributions to measure the effect of label skew on convergence.
 
 ## Summary
 

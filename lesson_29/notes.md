@@ -119,7 +119,7 @@ flowchart LR
     O --> OS["Global model oscillates"]
     W --> G["Slower convergence and lower accuracy"]
     OS --> G
-    E["More local epochs"] -. may reduce drift; adds local training time .-> D
+    E["More local epochs"] -. "may reduce drift; adds local training time" .-> D
 ```
 
 ### Communication Rounds, Local Epochs, and Batch Size
@@ -159,7 +159,7 @@ A Flower client implements the `NumPyClient` interface. The client defines two m
 
 Code sketch: A Flower server for 3 rounds with 10 virtual clients might look like:
 
-```
+```python
 strategy = fl.server.strategy.FedAvg(
     fraction_fit=1.0,  # All clients participate
     fraction_evaluate=1.0,
@@ -175,13 +175,13 @@ fl.server.start_server(
 
 On the client side, a Flower client that trains a neural network for 2 epochs might look like:
 
-```
+```python
 class MyClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         self.model.set_weights(parameters)
         self.model.fit(self.x_train, self.y_train, epochs=config['local_epochs'], batch_size=32, verbose=0)
         return self.model.get_weights(), len(self.x_train), {}
-    
+
     def evaluate(self, parameters, config):
         self.model.set_weights(parameters)
         loss, accuracy = self.model.evaluate(self.x_test, self.y_test)
@@ -192,7 +192,7 @@ Flower handles the mechanics of broadcasting, aggregating, and round orchestrati
 
 ## Lab
 
-See the lab notebook at [./lesson_29/lab.ipynb](./lab.ipynb).. The lab implements a FedAvg simulation with Flower on CIFAR-10, comparing IID and non-IID data distributions to measure the effect of label skew on convergence.
+See [lab.ipynb](./lab.ipynb). The lab implements a FedAvg simulation with Flower on CIFAR-10, comparing IID and non-IID data distributions to measure the effect of label skew on convergence.
 
 ## Summary
 

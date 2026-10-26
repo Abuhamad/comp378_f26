@@ -44,9 +44,9 @@ The effectiveness of a scaling attack depends on three primary amplification fac
 
 ### Gradient Inversion Attack: DLG
 
-Gradient inversion aims to reconstruct training data from the gradient updates shared in federated learning. The attacker (typically an honest-but-curious server or eavesdropper) observes the gradient $\nabla_w \mathcal{L}(f_w(x^*), y^*)$ and wants to recover the training sample $(x^*, y^*)$. The Deep Leakage from Gradients (DLG) algorithm solves this through optimization. The attacker initializes a dummy input $x'$ and dummy label $y'$ randomly, then computes the gradient of the dummy forward pass: $\nabla_w \mathcal{L}(f_w(x'), y')$. The attacker then minimizes the distance between the dummy gradient and the observed gradient using L-BFGS:
+Gradient inversion aims to reconstruct training data from the gradient updates shared in federated learning. The attacker (typically an honest-but-curious server or eavesdropper) observes the gradient $\nabla_w \mathcal{L}(f_w(x^{*}), y^{*})$ and wants to recover the training sample $(x^{*}, y^{*})$. The Deep Leakage from Gradients (DLG) algorithm solves this through optimization. The attacker initializes a dummy input $x'$ and dummy label $y'$ randomly, then computes the gradient of the dummy forward pass: $\nabla_w \mathcal{L}(f_w(x'), y')$. The attacker then minimizes the distance between the dummy gradient and the observed gradient using L-BFGS:
 
-$$\min_{x', y'} \left\| \nabla_w \mathcal{L}(f_w(x'), y') - \nabla_w \mathcal{L}(f_w(x^*), y^*) \right\|^2$$
+$$\min_{x', y'} \left\| \nabla_w \mathcal{L}\left(f_w(x'), y'\right) - \nabla_w \mathcal{L}\left(f_w(x^{*}), y^{*}\right) \right\|^2$$
 
 This optimization succeeds because gradients are deterministic functions of the input, label, model weights, and loss function. When the dummy input and label match the original training sample (up to floating-point precision), their gradient will match the observed gradient, and the loss reaches its minimum.
 

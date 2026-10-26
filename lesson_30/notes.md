@@ -17,9 +17,26 @@ Federated learning assumes all clients cooperate honestly, but a single compromi
 
 A Byzantine participant in a distributed system can deviate arbitrarily from the protocol. In federated learning, a Byzantine client might send random values, scaled values, or adversarially crafted updates instead of legitimate gradients. The classical Byzantine fault tolerance result from Lamport et al. establishes that a system with $n$ nodes can tolerate up to $f$ Byzantine faults only if $n \geq 3f + 1$. For a 10-client FL system with one Byzantine client ($f = 1$), this threshold requires at least 4 honest nodes, which is satisfied. However, FedAvg provides no fault-tolerance guarantee because it computes a simple weighted average of client updates. A single malicious client with a large enough update can shift the average arbitrarily, regardless of how many honest clients participate. The averaging operation treats all client gradients equally (up to a weighting factor based on local dataset size), making no distinction between honest and corrupted updates.
 
+```mermaid
+flowchart LR
+    H1["Honest client<br/>Δw"] --> AVG["FedAvg<br/>weighted average"]
+    H2["Honest client<br/>Δw"] --> AVG
+    M["Byzantine client<br/>λ · Δw"] -->|"amplified update"| AVG
+    AVG -->|"corrupted global model"| W["wᵗ⁺¹"]
+```
+
 ### Model Poisoning via Gradient Scaling
 
 A straightforward model-poisoning attack scales the malicious client's gradient update by a large factor before submission. Suppose a malicious client computes its legitimate gradient $g_{\text{mal}}$ from its local data. Instead of sending $g_{\text{mal}}$, it sends $\lambda \cdot g_{\text{mal}}$ where $\lambda$ is a scale factor much greater than 1. The FedAvg update rule aggregates client weights as $w^{t+1} = \sum_k \frac{n_k}{n} \Delta w_k^{t}$, where $n_k$ is the dataset size of client $k$ and $n$ is the total number of samples across all clients. When one client scales its update by $\lambda = 50$ and that client represents 10% of the total data ($\frac{n_{\text{mal}}}{n} = 0.1$), its effective contribution to the aggregate becomes $0.1 \times 50 = 5$ times a normal honest client's contribution. This scaled malicious update dominates the weighted average, pushing the global model parameters in the direction the attacker chooses. Over multiple rounds, the global model drifts away from the objectives of honest clients, and validation accuracy collapses. Empirically, a scale factor of 50 applied to one malicious client in a 10-client system with benign baseline accuracy of 92% after 5 rounds causes accuracy to drop below 10% within 10 rounds.
+
+```mermaid
+flowchart LR
+    A["Train locally<br/>get g_mal"] --> B["Scale update<br/>λ · g_mal"]
+    B --> C["Send to server"]
+    C --> D["Weighted average<br/>attacker weight = λ · (n_mal / n)"]
+    D --> E["Global model drifts"]
+    E --> F["Accuracy collapses<br/>over rounds"]
+```
 
 ### Scaling Attack Amplification
 
@@ -29,17 +46,77 @@ The effectiveness of a scaling attack depends on three primary amplification fac
 
 Gradient inversion aims to reconstruct training data from the gradient updates shared in federated learning. The attacker (typically a honest-but-curious server or eavesdropper) observes the gradient $\nabla_w \mathcal{L}(f_w(x^*), y^*)$ and wants to recover the training sample $(x^*, y^*)$. The Deep Leakage from Gradients (DLG) algorithm solves this through optimization. The attacker initializes a dummy input $x'$ and dummy label $y'$ randomly, then computes the gradient of the dummy forward pass: $\nabla_w \mathcal{L}(f_w(x'), y')$. The attacker then minimizes the distance between the dummy gradient and the observed gradient using L-BFGS:
 
-$\min_{x', y'} \| \nabla_w \mathcal{L}(f_w(x'), y') - \nabla_w \mathcal{L}(f_w(x^*), y^*)) \|^2$
+$$\min_{x', y'} \left\| \nabla_w \mathcal{L}(f_w(x'), y') - \nabla_w \mathcal{L}(f_w(x^*), y^*) \right\|^2$$
 
-This optimization succeeds because gradients are deterministic functions of the input, label, model weights, and loss function. When the dummy input and label match the original training sample (up to floating-point precision), their gradient will match the observed gradient, and the loss reaches its minimum. The DLG method requires the attacker to know the model weights $w$, which is true for an honest-but-curious server in FL. Reconstruction quality depends critically on the batch size. For a single training sample, the gradient directly encodes the input features and label, making reconstruction nearly perfect in terms of visual similarity. With batch size 8, the attacker sees the average of 8 samples' gradients, introducing ambiguity, but modern image samples are still recognizable after reconstruction. At batch size 64, the gradients reflect an average over many samples, and individual training images become indistinguishable.
+This optimization succeeds because gradients are deterministic functions of the input, label, model weights, and loss function. When the dummy input and label match the original training sample (up to floating-point precision), their gradient will match the observed gradient, and the loss reaches its minimum.
+
+```mermaid
+flowchart TD
+    START(["Attacker observes client gradient g* = ∇w L(fw(x*), y*)"]) --> INIT["Initialize dummy input x′<br/>and dummy label y′ randomly"]
+    INIT --> DUMMY["Forward + backward pass on (x′, y′)<br/>get dummy gradient g′ = ∇w L(fw(x′), y′)"]
+    DUMMY --> LOSS["Compute gradient-matching loss<br/>‖g′ − g*‖²"]
+    LOSS --> OPT["L-BFGS step on (x′, y′)"]
+    OPT --> CONV{"Loss converged<br/>(gradient match)?"}
+    CONV -->|"no — update dummy data"| DUMMY
+    CONV -->|"yes"| DONE(["Recovered sample (x′, y′) ≈ (x*, y*)"])
+```
+
+The DLG method requires the attacker to know the model weights $w$, which is true for an honest-but-curious server in FL. Reconstruction quality depends critically on the batch size. For a single training sample, the gradient directly encodes the input features and label, making reconstruction nearly perfect in terms of visual similarity. With batch size 8, the attacker sees the average of 8 samples' gradients, introducing ambiguity, but modern image samples are still recognizable after reconstruction. At batch size 64, the gradients reflect an average over many samples, and individual training images become indistinguishable.
 
 ### R-GAP Extension and Batch Size Sensitivity
 
-The Recursive Gradient Attack for Privacy (R-GAP) extends DLG to deeper networks by performing layer-by-layer gradient inversion. Earlier layers in the network operate on raw or minimally transformed input features, so their gradients carry more direct information about the input itself. By inverting layer by layer starting from the output layer and working backward, R-GAP can reconstruct training data from networks that DLG alone cannot break. This recursive approach reveals that batch size sensitivity persists across network depth. Empirical studies show that single-sample batches (batch size 1) allow reconstruction with SSIM scores above 0.9 on CIFAR-10 images, while batch size 4 degrades SSIM to roughly 0.7, and batch size 32 drops reconstruction quality below 0.5. SSIM (Structural Similarity Index Measure) ranges from -1 to 1, with 1.0 indicating identical images. The critical finding is that small batch sizes are a primary vulnerability for gradient inversion, because averaging fewer samples leaves more sample-specific structure in the gradient. Conversely, larger batch sizes and per-sample gradient clipping both add noise that masks individual training data from the gradient.
+The Recursive Gradient Attack for Privacy (R-GAP) extends DLG to deeper networks by performing layer-by-layer gradient inversion. Earlier layers in the network operate on raw or minimally transformed input features, so their gradients carry more direct information about the input itself. By inverting layer by layer starting from the output layer and working backward, R-GAP can reconstruct training data from networks that DLG alone cannot break.
+
+```mermaid
+flowchart RL
+    L["Output layer gradient<br/>(least input-specific)"] --> STEP1["Invert layer L<br/>reconstruct its input"]
+    STEP1 --> L1["Layer L−1 gradient"] --> STEP2["Invert layer L−1"]
+    STEP2 --> DOTS["... recurse backward ..."]
+    DOTS --> L0["Layer 1 gradient<br/>(most input-specific)"] --> STEP0["Invert layer 1"]
+    STEP0 --> REC(["Reconstructed training input x*"])
+```
+
+This recursive approach reveals that batch size sensitivity persists across network depth. Empirical studies show that single-sample batches (batch size 1) allow reconstruction with SSIM scores above 0.9 on CIFAR-10 images, while batch size 4 degrades SSIM to roughly 0.7, and batch size 32 drops reconstruction quality below 0.5. SSIM (Structural Similarity Index Measure) ranges from -1 to 1, with 1.0 indicating identical images. The critical finding is that small batch sizes are a primary vulnerability for gradient inversion, because averaging fewer samples leaves more sample-specific structure in the gradient. Conversely, larger batch sizes and per-sample gradient clipping both add noise that masks individual training data from the gradient.
 
 ### Evaluation Metrics for Federated Learning Attacks
 
-Evaluating FL attacks requires domain-specific metrics. For model-poisoning attacks like gradient scaling, the primary metric is per-round global model accuracy on a held-out test set, plotted as a curve over communication rounds. A typical experiment sets a benign baseline (all clients honest, standard FedAvg) and an attack scenario (one or more Byzantine clients with configured scale factors), then compares the two curves round by round. The attacker succeeds if the attack curve drops significantly faster than benign, and accuracy reaches below a target threshold (e.g., 20% for 10-class classification) within a specified number of rounds. Reporting includes the final-round accuracy under attack, the round at which accuracy first drops below 50%, and the total accuracy loss (e.g., benign 92%, attack 5%, loss of 87 percentage points). For gradient inversion attacks, evaluation metrics include reconstruction quality measures: SSIM (Structural Similarity) for image data, PSNR (Peak Signal-to-Noise Ratio) in decibels, and visual inspection for qualitative assessment. A reconstructed image with SSIM > 0.8 against the original is typically deemed a successful privacy breach. Additional reporting includes the batch size range over which reconstruction succeeds, the number of optimization steps (iterations) needed to converge, and the computational cost in GPU hours. These metrics allow direct comparison of attack strength across different batch sizes, network architectures, and numbers of local training epochs, establishing the conditions under which attacks succeed or fail.
+Evaluating FL attacks requires domain-specific metrics. A typical experiment sets a benign baseline (all clients honest, standard FedAvg) and an attack scenario (one or more Byzantine clients), then compares the two. These metrics allow direct comparison of attack strength across different batch sizes, network architectures, and numbers of local training epochs, establishing the conditions under which attacks succeed or fail.
+
+**Model-poisoning metrics** (e.g., gradient scaling), where the primary measure is per-round global accuracy on a held-out test set, plotted over communication rounds:
+
+- Final-round global accuracy under attack
+- First round at which accuracy drops below 50%
+- Total accuracy loss versus the benign baseline (e.g., benign 92%, attack 5% → 87-point loss)
+- Attack success criterion: the attack curve drops significantly faster than benign and falls below a target threshold (e.g., 20% for 10-class classification) within a fixed number of rounds
+
+**Gradient-inversion metrics** (e.g., DLG, R-GAP), which measure reconstruction quality:
+
+- SSIM (Structural Similarity Index) against the original image — SSIM $> 0.8$ is typically deemed a successful privacy breach
+- PSNR (Peak Signal-to-Noise Ratio), in decibels
+- Visual inspection for qualitative assessment
+- Batch-size range over which reconstruction still succeeds
+- Number of optimization steps (iterations) needed to converge
+- Computational cost in GPU hours
+
+```mermaid
+flowchart TB
+    subgraph ATTACKS["Attack vectors"]
+        P["Model poisoning<br/>(gradient scaling)"]
+        G["Gradient inversion<br/>(DLG / R-GAP)"]
+    end
+    subgraph METRICS["Success metrics"]
+        P --> PM["Per-round accuracy drop<br/>rounds below 50% / 20%"]
+        G --> GM["SSIM / PSNR of<br/>reconstruction"]
+    end
+    subgraph FACTORS["Key vulnerability factors"]
+        PM --> F1["Large λ; many malicious clients<br/>few honest clients"]
+        GM --> F2["Small batch size<br/>(batch 1 leaks most)"]
+    end
+    subgraph DEFENSES["Defenses"]
+        F1 -.->|"blunts poisoning"| D1["Robust aggregation<br/>(median, Krum, clipping)"]
+        F2 -.->|"masks per-sample signal"| D2["Large batches<br/>gradient clipping / noise"]
+    end
+```
 
 ## Lab
 

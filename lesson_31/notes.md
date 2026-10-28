@@ -148,7 +148,7 @@ flowchart LR
 
 ## Lab
 
-See [lab.ipynb](./lab.ipynb). The lab implements Multi-Krum (with Krum recovered as its $m=1$ special case) and Coordinate-wise Trimmed Mean against the m30 gradient-scaling attack on a toy federated gradient-descent task, works through a numeric double-masking demonstration of SecAgg's mask cancellation, applies the Gaussian mechanism to client updates and measures the $\epsilon$-vs-accuracy trade-off, and sweeps Multi-Krum's $m$ parameter to chart its performance-robustness trade-off directly.
+See [lab.ipynb](./lab.ipynb). The lab extends the m29 Flower/TensorFlow FedAvg simulation with a custom aggregation strategy that implements Multi-Krum (with Krum recovered as its $m=1$ special case) and Coordinate-wise Trimmed Mean, and runs real federated rounds against the m30 gradient-scaling attack on MNIST. It works through a numeric double-masking demonstration of SecAgg's mask cancellation, implements Local Differential Privacy as a Flower client that clips and noises its own update, and sweeps Multi-Krum's $m$ parameter and the privacy budget $\epsilon$ across real training runs to chart both the performance-robustness and the $\epsilon$-vs-accuracy trade-offs directly.
 
 ## Summary
 

@@ -152,7 +152,7 @@ flowchart TD
 
 ## Lab
 
-See [lab.ipynb](./lab.ipynb). The lab computes group fairness metrics (Demographic Parity, Equalized Odds, Disparate Impact) for a pre-trained lending classifier using the Adult Income dataset and traces the observed disparity to a specific bias taxonomy category.
+See [lab.ipynb](./lab.ipynb). The lab computes group fairness metrics (Demographic Parity, Equalized Odds, Disparate Impact) for a lending classifier trained on the Adult Income dataset and traces the observed disparity to a specific bias taxonomy category.
 
 ## Summary
 

@@ -58,7 +58,7 @@ Group fairness metrics measure disparity between protected groups. Three criteri
 
 **Equal Opportunity** requires only equal true positive rates across groups: $\mathrm{TPR}_A = \mathrm{TPR}_B$. Equal Opportunity relaxes Equalized Odds by allowing false positive rates to differ. A lender using Equal Opportunity ensures qualified applicants are approved at the same rate across genders, even if false alarm rates differ. This criterion is especially useful in high-stakes settings where false negatives (rejecting qualified applicants) matter more than false positives (approving unqualified ones).
 
-The three criteria can be seen as nested requirements on the confusion matrix, from strictest to most relaxed:
+Equal Opportunity is a relaxation of Equalized Odds, while Demographic Parity is an orthogonal axis (equality of predictions rather than of performance):
 
 ```mermaid
 flowchart TB
@@ -76,7 +76,7 @@ flowchart TB
     end
 ```
 
-**Worked example**: A lending classifier trained on 1000 applicants predicts 100 of 200 female applicants as approvable (approval rate $0.50$) and 150 of 800 male applicants as approvable (approval rate $0.19$). The Demographic Parity difference is $0.50 - 0.19 = 0.31$, indicating large disparity. Among truly qualified applicants (base ground truth), 80 of 100 female applicants and 75 of 150 male applicants are correctly identified as approvable ($\mathrm{TPR}_{\text{female}} = 0.80$, $\mathrm{TPR}_{\text{male}} = 0.50$). This gap in true positives violates Equal Opportunity. Equalized Odds further requires equal false positive rates: if false positives are 20 for females and 50 for males, the false positive rates are $\frac{20}{100} = 0.20$ and $\frac{50}{650} \approx 0.08$, showing further disparity.
+**Worked example**: A lending classifier trained on 1000 applicants predicts 100 of 200 female applicants as approvable (approval rate $0.50$) and 150 of 800 male applicants as approvable (approval rate $0.19$). The Demographic Parity difference is $0.50 - 0.19 = 0.31$, indicating large disparity. Among truly qualified applicants (base ground truth), 80 of 100 female applicants and 75 of 150 male applicants are correctly identified as approvable ($\mathrm{TPR}_{\text{female}} = 0.80$, $\mathrm{TPR}_{\text{male}} = 0.50$). This gap in true positives violates Equal Opportunity. Equalized Odds further requires equal false positive rates: the predictions above imply 20 false positives for females ($100 - 80$) and 75 for males ($150 - 75$), so the false positive rates are $\frac{20}{100} = 0.20$ and $\frac{75}{650} \approx 0.12$, showing further disparity.
 
 ### Individual Fairness
 
@@ -104,7 +104,7 @@ No fairness criterion can satisfy all reasonable desiderata simultaneously.
 
 **Chouldechova's theorem** establishes Demographic Parity, Predictive Parity ($\mathrm{PPV}_A = \mathrm{PPV}_B$, equal precision across groups), and Equal FPR/FNR cannot hold simultaneously when base rates differ between groups. Proof sketch: assume base rates differ (e.g., 80 percent of group $A$ is truly positive, 20 percent of group $B$ is truly positive). Demographic Parity requires $P(\hat{Y} = 1 \mid A) = P(\hat{Y} = 1 \mid B)$. For both groups, the ratio of true positives to total positives in each group differs under Demographic Parity when base rates diverge. This forces a trade-off between equal prediction rates and equal performance rates. Concretely, in the lending example above, forcing Demographic Parity across genders (equal approval rates) while maintaining Equal FPR (equal false alarm rates) means the true positive rates must differ. Qualified women or men will be approved at different rates.
 
-**Kleinberg et al. calibration impossibility** extends this to calibrated predictions. A model is calibrated if predicted probability equals true probability: $P(Y = 1 \mid \hat{Y} = p) = p$. Impossibility result: a model cannot be calibrated across multiple groups and satisfy Demographic Parity simultaneously, except in degenerate cases. The tension arises because Demographic Parity forces equal prediction distributions across groups, but calibration per group constrains predictions to reflect true conditional likelihoods. These pressures conflict when base rates differ.
+**Kleinberg et al. calibration impossibility** extends this to calibrated predictions. A model is calibrated if predicted probability equals true probability: $P(Y = 1 \mid \hat{Y} = p) = p$. Impossibility result: a model cannot be simultaneously calibrated within each group and achieve equal error rates ($\mathrm{FPR}_A = \mathrm{FPR}_B$ and $\mathrm{FNR}_A = \mathrm{FNR}_B$) across groups, except in degenerate cases. The tension arises because calibration per group constrains predictions to reflect true conditional likelihoods, while equal error rates constrain performance to match across groups. These pressures conflict when base rates differ.
 
 **Practical implication**: practitioners cannot optimize for all fairness metrics at once. Metric choice must align with the deployment context and stakeholder values.
 
@@ -125,14 +125,14 @@ flowchart TB
     C2 <-.-> C3
     C1 <-.-> C3
 
-    CAL["Calibration per group<br/>P(Y=1 | Ŷ=p) = p"] -. "Kleinberg: also incompatible<br/>with Demographic Parity" .-> C1
+    CAL["Calibration per group<br/>P(Y=1 | Ŷ=p) = p"] -. "Kleinberg: also incompatible<br/>with equal error rates" .-> C3
 ```
 
 ### Recap: Mapping Bias Taxonomy to Fairness Metrics and Metric Selection
 
 Addressing bias requires mapping its source to an appropriate metric. If the training data reflects historical discrimination (historical bias), the fairness goal is often to protect group outcomes: Demographic Parity or Equal Opportunity may apply. If the issue is underrepresentation (representation bias), stratified data collection or rebalancing during training is primary, but fairness metrics post-hoc measure residual disparity. If measurement bias is suspected (a feature is a proxy for a protected attribute), feature engineering and transparency become critical, and no metric alone cures the root problem.
 
-Metric selection depends on deployment context. In criminal justice, equal false negative rates (Equal Opportunity for recidivism prediction, avoiding over-prediction for minorities) aligns with public values of reducing unnecessary incarceration. In lending, Equal Opportunity (equal approval rates for qualified candidates) may be preferred over Demographic Parity to avoid rejecting qualified applicants to meet a statistical target. Some domains value Predictive Parity (equal precision) to ensure prediction quality is consistent.
+Metric selection depends on deployment context. In criminal justice, equal false positive rates (avoiding over-prediction of recidivism for minority defendants) aligns with public values of reducing unnecessary incarceration. In lending, Equal Opportunity (equal approval rates for qualified candidates) may be preferred over Demographic Parity to avoid rejecting qualified applicants to meet a statistical target. Some domains value Predictive Parity (equal precision) to ensure prediction quality is consistent.
 
 No universal rule determines the best metric. Stakeholder engagement, transparency about tradeoffs, and domain expertise guide the choice.
 
@@ -145,7 +145,7 @@ flowchart TD
     D -->|"Aggregation bias<br/>(heterogeneous subpopulations)"| M4["Per-group models /<br/>thresholds; measure parity<br/>within each group"]
 
     M1 --> CTX{"Deployment context?"}
-    CTX -->|"Criminal justice:<br/>avoid over-prediction"| E1["Equal Opportunity /<br/>equal FNR"]
+    CTX -->|"Criminal justice:<br/>avoid over-prediction"| E1["Equal FPR<br/>(equalized error rates)"]
     CTX -->|"Lending:<br/>approve qualified applicants"| E2["Equal Opportunity<br/>(equal TPR)"]
     CTX -->|"Consistent prediction<br/>quality matters"| E3["Predictive Parity<br/>(equal precision)"]
 ```
@@ -161,8 +161,8 @@ Fairness in AI is a concrete technical problem, not an abstract ideal. Bias ente
 ## Useful References and Resources
 
 - Chouldechova, A. (2017). "Fair prediction with disparate impact: A study of bias in recidivism prediction instruments." Big data, 5(2), 153–163.
-- Kleinberg, J., Ludwig, J., Mullainathan, S., & Sunstein, C. R. (2018). "Discrimination in the age of algorithms." Journal of Political Economy, 126(S1), S188–S235.
+- Kleinberg, J., Mullainathan, S., & Raghavan, M. (2017). "Inherent Trade-Offs in the Fair Determination of Risk Scores." In Proceedings of Innovations in Theoretical Computer Science (ITCS).
 - ProPublica (2016). "Machine Bias." Investigative article examining COMPAS recidivism scoring accuracy across demographic groups.
-- Buolamwini, B., & Buolamwini, B. (2018). "Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification." In Conference on Fairness, Accountability and Transparency (pp. 77–91). PMLR.
+- Buolamwini, J., & Gebru, T. (2018). "Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification." In Conference on Fairness, Accountability and Transparency (pp. 77–91). PMLR.
 - AIF360 (AI Fairness 360) Python library documentation (IBM). Fairness metrics and algorithms for bias detection and mitigation.
 - Barocas, S., Hardt, M., & Narayanan, A. (2019). "Fairness and Machine Learning." fairmlbook.org. Comprehensive textbook covering fairness theory and practice.

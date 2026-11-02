@@ -117,8 +117,8 @@ The method applies to binary classifiers that output probability scores or soft 
 
 The optimization problem is a linear program. For each group $g$ and each possible threshold $t_g \in [0, 1]$, compute:
 
-- True positive rate: $\mathrm{TPR}_g(t_g) = \frac{\#(\text{predicted positive, label positive, group } g)}{\#(\text{label positive, group } g)}$
-- False positive rate: $\mathrm{FPR}_g(t_g) = \frac{\#(\text{predicted positive, label negative, group } g)}{\#(\text{label negative, group } g)}$
+- True positive rate: $\mathrm{TPR}_g(t_g) = \frac{\text{count}(\text{predicted positive, label positive, group } g)}{\text{count}(\text{label positive, group } g)}$
+- False positive rate: $\mathrm{FPR}_g(t_g) = \frac{\text{count}(\text{predicted positive, label negative, group } g)}{\text{count}(\text{label negative, group } g)}$
 
 Find thresholds $t_0, t_1, \dots, t_k$ that satisfy:
 

@@ -76,7 +76,7 @@ flowchart TB
     end
 ```
 
-**Worked example**: A lending classifier trained on 1000 applicants predicts 100 of 200 female applicants as approvable (approval rate $0.50$) and 150 of 800 male applicants as approvable (approval rate $0.19$). The Demographic Parity difference is $0.50 - 0.19 = 0.31$, indicating large disparity. Among truly qualified applicants (base ground truth), 80 of 100 female applicants and 75 of 150 male applicants are correctly identified as approvable ($\mathrm{TPR}_{\text{female}} = 0.80$, $\mathrm{TPR}_{\text{male}} = 0.50$). This gap in true positives violates Equal Opportunity. Equalized Odds further requires equal false positive rates: the predictions above imply 20 false positives for females ($100 - 80$) and 75 for males ($150 - 75$), so the false positive rates are $\frac{20}{100} = 0.20$ and $\frac{75}{650} \approx 0.12$, showing further disparity.
+**Worked example**: A lending classifier trained on 1000 applicants predicts 100 of 200 female applicants as approvable (approval rate $0.50$) and 150 of 800 male applicants as approvable (approval rate $0.19$). The Demographic Parity difference is $0.50 - 0.19 = 0.31$, indicating large disparity. Among truly qualified applicants (base ground truth), 80 of 100 female applicants and 75 of 150 male applicants are correctly identified as approvable (${TPR}_{\text{female}} = 0.80$, ${TPR}_{\text{male}} = 0.50$). This gap in true positives violates Equal Opportunity. Equalized Odds further requires equal false positive rates: the predictions above imply 20 false positives for females ($100 - 80$) and 75 for males ($150 - 75$), so the false positive rates are $\frac{20}{100} = 0.20$ and $\frac{75}{650} \approx 0.12$, showing further disparity.
 
 ### Individual Fairness
 

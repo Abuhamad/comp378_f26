@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This lesson examines four practical mitigation techniques for reducing bias and improving fairness in deployed classifiers. Mitigation occurs at three distinct points in the ML pipeline: before training (pre-processing), during training (in-processing), and after training (post-processing). Students learn to implement re-weighing, disparate impact remover, adversarial debiasing, and threshold adjustment using the AIF360 toolkit, and measure the accuracy-fairness trade-off each technique introduces.
+This lesson examines four practical mitigation techniques for reducing bias and improving fairness in deployed classifiers. Mitigation occurs at three distinct points in the ML pipeline: before training (pre-processing), during training (in-processing), and after training (post-processing). Students learn to implement re-weighing, disparate impact remover, adversarial debiasing, and threshold adjustment using the **AIF360** toolkit, and measure the accuracy-fairness trade-off each technique introduces.
 
 ## Objectives
 

@@ -32,6 +32,50 @@ flowchart TB
     GU --> M
 ```
 
+### A Taxonomy of Interpretation Methods
+
+Model interpretation can be obtained through two basic methods.
+
+**Post-hoc interpretation** explains an already-trained model without modifying it. This can be accomplished by adjusting the complexity of DNNs or by employing post-training techniques. Some strategies even require the development of a new model (a surrogate or masking model) whose sole job is to provide interpretations of the present model. Post-hoc methods are attractive in practice because they apply to any deployed model without retraining.
+
+**Intrinsic interpretation** is produced by developing self-interpretable models, which intrinsically embed the interpretability feature into their structures. Linear and logistic regression, decision trees, generalized additive models (GAMs/EBMs), attention-based architectures, and prototype networks (e.g., ProtoPNet) are intrinsically interpretable: their parameters or architecture *are* the explanation. The trade-off is that self-interpretable models may sacrifice predictive accuracy relative to opaque, high-capacity models.
+
+#### The Four Categories of Post-hoc Interpreters
+
+**1. Backpropagation-guided interpretation.** Interpreters in this category compute the gradient of a DNN's prediction with respect to the provided sample input. This highlights the significance of each feature in the input sample: larger (absolute) gradient values suggest higher importance of the feature to the model's prediction. The canonical example is gradient saliency (vanilla Grad, Simonyan et al., 2014). Other examples include Integrated Gradients (covered below), Grad $\times$ Input, Guided Backpropagation, DeepLIFT, and SmoothGrad (which averages gradients over many noisy copies of the input to sharpen the saliency map).
+
+**2. Representation-guided interpretation.** Interpreters in this category extract feature maps from intermediate layers of the DNN to produce attribution maps, exploiting the spatial and semantic structure learned inside the network rather than relying on input gradients alone. Examples include Class Activation Mapping (CAM), Grad-CAM, Grad-CAM++, Score-CAM, and LayerCAM.
+
+**3. Model-guided interpretation.** Interpreters in this category train a masking model to directly predict the attribution map in a single forward pass, by learning to mask the salient positions of any input. Because the masking model is trained once and then applied at inference time, explanations are produced in real time. The representative example is Real-Time Image Saliency (RTS, Dabkowski & Gal, 2017); learned surrogate explainer models more generally also fall in this category.
+
+**4. Perturbation-guided interpretation.** Interpreters in this category find attribution maps by adding (minimal) noise or masks to the input and examining the resulting shift in the model's output. Features whose removal or corruption shifts the output the most are the most important. Examples include MASK (meaningful perturbations, Fong & Vedaldi, 2017), occlusion sensitivity, RISE (randomized input sampling), LIME, and SHAP.
+
+#### Interpreters, we consider in this lesson: SHAP, LIME, and Integrated Gradients Fit
+
+- **Integrated Gradients** is *backpropagation-guided*: it integrates input gradients along a straight baseline-to-input path, inheriting the gradient-saliency lineage while adding the sensitivity and completeness axioms.
+- **LIME** is *perturbation-guided*: it perturbs the input (superpixel toggling for images, noise for tabular data), observes the output shift on each perturbation, and fits a weighted local linear surrogate to summarize which perturbations mattered.
+- **SHAP (KernelSHAP)** is *perturbation-guided*: coalitions are masked versions of the input, and Shapley values average the output shift caused by adding each feature. TreeSHAP is the exception that also exploits the model's internal representation (the tree structure) to compute the same values exactly and quickly.
+
+```mermaid
+flowchart TB
+    ROOT["Model interpretation"] --> POST["Post-hoc interpretation<br/><i>explain an already-trained model;<br/>no retraining required</i>"]
+    ROOT --> INTR["Intrinsic interpretation<br/><i>self-interpretable architecture</i>"]
+
+    INTR --> INTR_EX["Linear / logistic regression, decision trees,<br/>GAMs/EBMs, attention models, ProtoPNet"]
+
+    POST --> BP["1. Backpropagation-guided<br/><i>gradient of prediction w.r.t. input</i>"]
+    POST --> REP["2. Representation-guided<br/><i>intermediate feature maps</i>"]
+    POST --> MG["3. Model-guided<br/><i>learned masking model</i>"]
+    POST --> PERT["4. Perturbation-guided<br/><i>noise/mask the input, watch the output shift</i>"]
+
+    BP --> BP_EX["Grad saliency, Grad×Input, Guided Backprop,<br/>DeepLIFT, SmoothGrad, <b>Integrated Gradients</b>"]
+    REP --> REP_EX["CAM, Grad-CAM, Grad-CAM++,<br/>Score-CAM, LayerCAM"]
+    MG --> MG_EX["RTS (Real-Time Image Saliency),<br/>learned surrogate explainers"]
+    PERT --> PERT_EX["MASK, occlusion sensitivity, RISE,<br/><b>LIME</b>, <b>SHAP (KernelSHAP)</b>"]
+```
+
+The remainder of this lesson develops the three highlighted methods: SHAP and LIME (perturbation-guided and model-agnostic) and Integrated Gradients (backpropagation-guided, requiring gradient access to the model).
+
 ### SHAP (SHapley Additive exPlanations)
 
 SHAP grounds feature attribution in Shapley values from cooperative game theory. In a coalition game, players contribute to a total payoff, and the Shapley value assigns each player a fair share based on their marginal contribution across all possible coalitions. For machine learning, features are players, the model is the game, and the prediction is the payoff. The Shapley value for feature $i$ is the average marginal contribution of feature $i$ when added to every possible subset of the other features.
@@ -148,6 +192,27 @@ The lab notebook at [lab.ipynb](./lab.ipynb) exercises KernelSHAP on a tabular c
 Explaining model predictions requires specifying scope: local explanations answer "why this prediction" while global explanations reveal model-wide tendencies. Shapley values offer a theoretically grounded, consistent foundation for local attribution. KernelSHAP and TreeSHAP make this practical on real models. LIME builds local linear surrogates through neighborhood sampling, offering model-agnostic explanations but without formal guarantees. Integrated Gradients uses gradient paths to produce pixel-level or feature-level attributions satisfying completeness. All three methods are vulnerable to instability: small input changes can shift attributions significantly, raising concerns for use in audits or policy decisions. Measuring stability through perturbation analysis reveals whether explanations are reliable enough for high-stakes applications.
 
 ## Useful References and Resources
+
+Taxonomy of interpretation methods (post-hoc vs. intrinsic; the four post-hoc categories):
+
+- Simonyan, K., Vedaldi, A., & Zisserman, A. (2014). Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps. In ICLR Workshop. [Introduces gradient saliency, the canonical backpropagation-guided method]
+- Springenberg, J. T., Dosovitskiy, A., Brox, T., & Riedmiller, M. (2015). Striving for Simplicity: The All Convolutional Net. In ICLR Workshop. [Introduces Guided Backpropagation]
+- Shrikumar, A., Greenside, P., & Kundaje, A. (2017). Learning Important Features Through Propagating Activation Differences. In International Conference on Machine Learning (ICML). [Introduces DeepLIFT and the Grad × Input heuristic]
+- Smilkov, D., Thorat, N., Kim, B., Viégas, F., & Wattenberg, M. (2017). SmoothGrad: Removing Noise by Adding Noise. In ICML Workshop on Visualization for Deep Learning. [Averages gradients over noisy input copies to sharpen saliency maps]
+- Zeiler, M. D., & Fergus, R. (2014). Visualizing and Understanding Convolutional Networks. In European Conference on Computer Vision (ECCV). [Introduces occlusion sensitivity, an early perturbation-guided method]
+- Zhou, B., Khosla, A., Lapedriza, A., Oliva, A., & Torralba, A. (2016). Learning Deep Features for Discriminative Localization. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR). [Introduces Class Activation Mapping (CAM), representation-guided]
+- Selvaraju, R. R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., & Batra, D. (2017). Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization. In International Conference on Computer Vision (ICCV). [Introduces Grad-CAM, representation-guided]
+- Chattopadhay, A., Sarkar, A., Howlader, P., & Balasubramanian, V. N. (2018). Grad-CAM++: Generalized Gradient-Based Visual Explanations for Deep Convolutional Networks. In IEEE Winter Conference on Applications of Computer Vision (WACV). [Improves Grad-CAM for multiple object instances]
+- Wang, H., Wang, Z., Du, M., Yang, F., Zhang, Z., Ding, S., Mardziel, P., & Hu, X. (2020). Score-CAM: Score-Weighted Visual Explanations for Convolutional Neural Networks. In CVPR Workshops. [Removes gradient dependence from CAM-style maps]
+- Jiang, P.-T., Zhang, C.-B., Hou, Q., Cheng, M.-M., & Wei, Y. (2021). LayerCAM: Exploring Hierarchical Class Activation Maps for Localization. In IEEE Transactions on Image Processing. [Uses shallow-layer feature maps for finer localization]
+- Dabkowski, P., & Gal, Y. (2017). Real Time Image Saliency for Black Box Classifiers. In Advances in Neural Information Processing Systems (NeurIPS). [Introduces RTS, the canonical model-guided masking interpreter]
+- Fong, R. C., & Vedaldi, A. (2017). Interpretable Explanations of Black Boxes by Meaningful Perturbation. In International Conference on Computer Vision (ICCV). [Introduces MASK: minimal input perturbations that shift the output]
+- Petsiuk, V., Das, A., & Saenko, K. (2018). RISE: Randomized Input Sampling for Explanation of Black-box Models. In British Machine Vision Conference (BMVC). [Random-masking perturbation-guided attribution]
+- Chen, C., Li, O., Tao, D., Barnett, A., Rudin, C., & Su, J. K. (2019). This Looks Like That: Deep Learning for Interpretable Image Recognition. In Advances in Neural Information Processing Systems (NeurIPS). [Introduces ProtoPNet, an intrinsically interpretable architecture]
+- Lou, Y., Caruana, R., & Gehrke, J. (2012). Intelligible Models for Classification and Regression. In ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. [Generalized additive models as intrinsically interpretable predictors]
+- Nori, H., Jenkins, S., Koch, P., & Caruana, R. (2019). InterpretML: A Unified Framework for Machine Learning Interpretability. arXiv:1909.09223. [Explainable Boosting Machines (EBMs), a modern self-interpretable GAM]
+
+Core methods covered in this lesson:
 
 - Lundberg, S., & Lee, S. I. (2017). A Unified Approach to Interpreting Model Predictions. In Advances in Neural Information Processing Systems (NIPS). [Introduces SHAP and connects Shapley values to feature attribution]
 - Ribeiro, M. T., Singh, S., & Guestrin, C. (2016). Why Should I Trust You?: Explaining the Predictions of Any Classifier. In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining. [Introduces LIME]

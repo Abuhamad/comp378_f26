@@ -181,7 +181,7 @@ flowchart TB
 
 ### Attention to Scope
 
-This lesson focuses on local and global explanations through SHAP, LIME, and Integrated Gradients, and measurement of explanation stability. Fairness metrics and bias mitigation belong to m32. AI governance frameworks and formal auditing processes belong to m35. Guardrail configuration and PII handling belong to m39. Counterfactual explanations (e.g., "if income were $5,000 higher, the prediction would change") and concept-based explanations (TCAV) are outside the course scope.
+This lesson focuses on local and global explanations through SHAP, LIME, and Integrated Gradients, and measurement of explanation stability. Fairness metrics and bias mitigation belong to **Lesson 32**. AI governance frameworks and formal auditing processes belong to **Lesson 35**. Guardrail configuration and PII handling belong to **Lesson 39**. Counterfactual explanations (e.g., "if income were $5,000 higher, the prediction would change") and concept-based explanations (TCAV) are outside the course scope.
 
 ## Lab
 

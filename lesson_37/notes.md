@@ -52,7 +52,11 @@ Crafting an adversarial document requires knowledge of the embedding model and t
 This document uses keywords ("password reset") overlapping the target query "How do I reset my account password?" so its embedding ranks in the top-$k$ results. The instruction payload (send an email) targets the LLM's tool-calling interface.
 
 Cosine similarity between a query embedding $\mathbf{q}$ and a document embedding $\mathbf{d}$ measures document-query alignment:
-$$\operatorname{sim}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q} \cdot \mathbf{d}}{\lVert \mathbf{q} \rVert \, \lVert \mathbf{d} \rVert} \in [-1, 1].$$
+
+```math
+\operatorname{sim}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q} \cdot \mathbf{d}}{\lVert \mathbf{q} \rVert \, \lVert \mathbf{d} \rVert} \in [-1, 1].
+```
+
 A document embedding close to the query embedding retrieves at high rank. An attacker cannot directly change the embedding model's weights, but an attacker can choose text that, when embedded, naturally falls into the target region. Language models trained on web text encode semantically similar phrases close together. A document mentioning password reset keywords embeds near password-reset queries.
 
 Retrieval ranking by cosine similarity favors documents whose embeddings are near the query embedding. An adversarial document embeds into the target semantic region and retrieves with confidence scores (cosine similarities) matching or exceeding legitimate documents. The retriever ranks it by score alone, providing no provenance check or source validation.

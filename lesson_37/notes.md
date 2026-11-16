@@ -54,7 +54,7 @@ This document uses keywords ("password reset") overlapping the target query "How
 Cosine similarity between a query embedding $\mathbf{q}$ and a document embedding $\mathbf{d}$ measures document-query alignment:
 
 ```math
-\operatorname{sim}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q} \cdot \mathbf{d}}{\lVert \mathbf{q} \rVert \, \lVert \mathbf{d} \rVert} \in [-1, 1].
+{sim}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q} \cdot \mathbf{d}}{\lVert \mathbf{q} \rVert \, \lVert \mathbf{d} \rVert} \in [-1, 1].
 ```
 
 A document embedding close to the query embedding retrieves at high rank. An attacker cannot directly change the embedding model's weights, but an attacker can choose text that, when embedded, naturally falls into the target region. Language models trained on web text encode semantically similar phrases close together. A document mentioning password reset keywords embeds near password-reset queries.

@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This capstone lesson synthesizes security defenses from all 39 prior modules into a coherent defense-in-depth posture. You will learn to plan and execute structured red-team assessments covering evasion, data poisoning, model extraction, and LLM injection attacks, map each attack to its kill chain stage, execute blue-team monitoring and incident response, and interpret real-world AI security failures. The capstone integrates offense and defense as two sides of the same continuous security loop.
+This capstone lesson synthesizes security defenses from all 39 prior lessons into a coherent defense-in-depth posture. You will learn to plan and execute structured red-team assessments covering evasion, data poisoning, model extraction, and LLM injection attacks, map each attack to its kill chain stage, execute blue-team monitoring and incident response, and interpret real-world AI security failures. The capstone integrates offense and defense as two sides of the same continuous security loop.
 
 ## Objectives
 
@@ -105,7 +105,7 @@ Each incident involved a failure at one of the kill chain stages. The stop-sign 
 
 ## Lab
 
-See [./m40-capstone-ai-red-teaming-and-blue-teaming/lab-latest.ipynb](./m40-capstone-ai-red-teaming-and-blue-teaming/lab-latest.ipynb). The lab begins with a structured red-team planning phase where students define scope, threat model, rules of engagement, and success criteria (Step 0: 3 min), then executes a multi-domain red-team assessment covering data poisoning, evasion, model extraction, and LLM injection (Steps 1–4), constructs a kill chain mapping for each attack, activates blue-team monitoring to detect two attacks in progress, and produces a combined incident response report (Step 5).
+See [lab_red_team.ipynb](./lab_red_team.ipynb) and [lab_blue_team.ipynb](./lab_blue_team.ipynb) for hands-on exercises.
 
 ## Summary
 
@@ -114,7 +114,7 @@ This capstone synthesized 39 prior lessons into a coherent security posture span
 ## Useful References and Resources
 
 - NIST AI Risk Management Framework (Lesson 35): AI Impact Assessment template for recording threat models and blue-team response plans.
-- MITRE ATT&CK for Enterprise (m07): Kill chain taxonomy adapted for AI systems. Privilege Escalation and Persistence techniques map to training-stage attacks.
+- MITRE ATT&CK for Enterprise (Lesson 07): Kill chain taxonomy adapted for AI systems. Privilege Escalation and Persistence techniques map to training-stage attacks.
 - Adversarial Robustness Toolbox (Lesson 19): Red-teaming framework for multi-class attack orchestration and AutoAttack and ART evaluation suites.
 - Robustness Benchmarking (Lesson 19): Benchmark suite (RobustBench) for testing defenses against standardized attacks.
 - DP-SGD and Differentially-Private Training (Lesson 27): Privacy budget accounting and formal privacy guarantees for training.
